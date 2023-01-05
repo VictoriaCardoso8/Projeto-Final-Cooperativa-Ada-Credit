@@ -38,7 +38,7 @@ namespace Ada_Credit
 
             var Clients = new ConsoleMenu(args, level: 1)
                 .Add("Cadastrar Novo Cliente", AddNewClient.Execute)
-                .Add("Consultar os Dados de um Cliente existente", Repositories.ClientRepositories.ClientConsult)
+                .Add("Consultar os Dados de um Cliente existente", UseCasesClient.ClientConsult.Execute)
                 .Add("Alterar o Cadastro de um Cliente existente", ChangeClients.Show)
                 .Add("Desativar Cadastro de um Cliente existente", Repositories.ClientRepositories.ClientChangeStatus)
                 .Add("Voltar", ConsoleMenu.Close)
