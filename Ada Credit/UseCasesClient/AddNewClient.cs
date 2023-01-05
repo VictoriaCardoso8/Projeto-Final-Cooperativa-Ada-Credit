@@ -16,8 +16,7 @@ namespace Ada_Credit.UseCasesClient
             Console.Write("Insira o nome do Cliente:");
             var name = Console.ReadLine();
             Console.Write("Insira o CPF do cliente:");
-            var stringdocument = Console.ReadLine();
-            var document = long.Parse(stringdocument);
+            var document = Console.ReadLine();
             var client = new Client(name, document);
             var account = new Account();
             Repositories.ClientRepositories.AddClient(client, account);

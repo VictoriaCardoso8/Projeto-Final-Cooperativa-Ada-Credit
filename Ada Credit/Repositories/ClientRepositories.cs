@@ -9,6 +9,8 @@ using System.IO;
 using CsvHelper.Configuration;
 using CsvHelper;
 using System.Globalization;
+using Bogus.DataSets;
+using System.Xml.Linq;
 
 namespace Ada_Credit.Repositories
 {
@@ -45,42 +47,30 @@ namespace Ada_Credit.Repositories
             var result = ListOfClients.FirstOrDefault(x => x.Name == name);
             if (result != null)
             {
-                string[] Lines = System.IO.File.ReadAllLines(csvPath);
-
-                foreach (string Line in Lines)
+                var clients = from c in ListOfClients
+                              where c.Name == name
+                              select c;
+                
+                foreach (var c in clients)
                 {
-                    string[] dados = Line.Split(',');
-                    string ClientName = dados[0];
-                    string ClientDocument = dados[1];
-                    string ClientAccount = dados[2];
-                    string ClientActive = dados[3];
-                    if (ClientName == name && ClientActive == "True")
-                    {
+                    if (c.Active)
                         Console.Clear();
                         Console.WriteLine("Cliente ativo!");
-                        Console.WriteLine($"Cliente possui CPF:{ClientDocument}");
-                        Console.WriteLine($"Cliente possui numero de conta:{ClientAccount}");
+                        Console.WriteLine($"Cliente de nome:{c.Name}");
+                        Console.WriteLine($"Cliente possui CPF:{c.Document}");
+                        Console.WriteLine($"Cliente possui numero de conta:{c.Account.Number}");
                         Console.WriteLine("Pressione qualquer tecla para continuar");
                         Console.ReadKey();
                         return;
-                    }
-                    if (ClientName == name && ClientActive == "False")
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Cliente inativo!");
-                        Console.WriteLine($"Cliente possui CPF:{ClientDocument}");
-                        Console.WriteLine($"Cliente possui numero de conta:{ClientAccount}");
-                        Console.WriteLine("Pressione qualquer tecla para continuar");
-                        Console.ReadKey();
-                        return;
-                    }
                 }
-
             }
-            Console.Clear();
-            Console.WriteLine("Cliente não encontrado!");
-            Console.WriteLine("Pressione qualquer tecla para continuar");
-            Console.ReadKey();
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Cliente não encontrado!");
+                Console.WriteLine("Pressione qualquer tecla para continuar");
+                Console.ReadKey();
+            }
         }
 
         public static void ClientChangeName()
@@ -88,63 +78,68 @@ namespace Ada_Credit.Repositories
             Console.Clear();
             Console.Write("Insira o nome do cliente que deseja alterar: ");
             var name = Console.ReadLine();
-
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
-            string[] Lines = System.IO.File.ReadAllLines(csvPath);
-
-            foreach (string Line in Lines)
+            var result = ListOfClients.FirstOrDefault(x => x.Name == name);
+            if (result != null)
             {
-                string[] dados = Line.Split(',');
-                string ClientName = dados[0];
-                string ClientDocument = dados[1];
-                string ClientAccount = dados[2];
-                string ClientActive = dados[3];
-                if (ClientName == name && ClientActive == "True")
+                var clients = from c in ListOfClients
+                              where c.Name == name
+                              select c;
+
+                foreach (var c in clients)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Cliente encontrado!");
-
-
-
-                    return;
-
+                    if (c.Active)
+                        Console.Clear();
+                        Console.WriteLine("Qual o novo nome a se utilizar? ");
+                        var newname = Console.ReadLine();
+                        result.Name = newname;
+                        Console.WriteLine("Pressione qualquer tecla para continuar");
+                        Console.ReadKey();
+                        Save();
+                        return;
                 }
             }
-            Console.Clear();
-            Console.WriteLine("Cliente não encontrado!");
-            Console.WriteLine("Pressione qualquer tecla para continuar");
-            Console.ReadKey();
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Cliente não encontrado!");
+                Console.WriteLine("Pressione qualquer tecla para continuar");
+                Console.ReadKey();
+
+            }
         }
         public static void ClientChangeCPF()
         {
             Console.Clear();
             Console.Write("Insira o nome do cliente que deseja alterar: ");
             var name = Console.ReadLine();
-
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
-            string[] Lines = System.IO.File.ReadAllLines(csvPath);
-
-            foreach (string Line in Lines)
+            var result = ListOfClients.FirstOrDefault(x => x.Name == name);
+            if (result != null)
             {
-                string[] dados = Line.Split(',');
-                string ClientName = dados[0];
-                string ClientDocument = dados[1];
-                string ClientAccount = dados[2];
-                string ClientActive = dados[3];
-                if (ClientName == name && ClientActive == "True")
+                var clients = from c in ListOfClients
+                              where c.Name == name
+                              select c;
+
+                foreach (var c in clients)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Cliente encontrado!");
-
-
+                    if (c.Active)
+                        Console.Clear();
+                    Console.WriteLine("Qual o novo CPF a se utilizar? ");
+                    var newCPF = Console.ReadLine();
+                    result.Document = newCPF;
+                    Console.WriteLine("Pressione qualquer tecla para continuar");
+                    Console.ReadKey();
+                    Save();
                     return;
                 }
             }
-            Console.Clear();
-            Console.WriteLine("Cliente não encontrado!");
-            Console.WriteLine("Pressione qualquer tecla para continuar");
-            Console.ReadKey();
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Cliente não encontrado!");
+                Console.WriteLine("Pressione qualquer tecla para continuar");
+                Console.ReadKey();
 
+            }
         }
         public static void UpdateClientList()
         {
@@ -176,6 +171,15 @@ namespace Ada_Credit.Repositories
             }
             else
                 Console.WriteLine("Cliente não existente");
+        }
+        public static void Save()
+        {
+            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
+            using (var writer = new StreamWriter(csvPath))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(ListOfClients);
+            }
         }
 
     }
