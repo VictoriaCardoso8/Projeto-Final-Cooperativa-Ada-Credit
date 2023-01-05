@@ -22,8 +22,8 @@ namespace Ada_Credit
             var username = Console.ReadLine();
             Console.Write("Digite a senha: ");
             var password = Console.ReadLine();
-
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "EmployeeList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "EmployeeList.csv");
             string[] Lines = System.IO.File.ReadAllLines(csvPath);
 
             

@@ -21,7 +21,8 @@ namespace Ada_Credit.Repositories
         {
             TryClient(client.Name);
             ListOfClients.Add(client);
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "ClientList.csv");
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvPath, true))
             {
                 file.WriteLine(client.Name + "," + client.Document + "," + account.Number + "," + client.Active);
@@ -43,7 +44,8 @@ namespace Ada_Credit.Repositories
             Console.Clear();
             Console.Write("Insira o nome do cliente: ");
             var name = Console.ReadLine();
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "ClientList.csv");
             var result = ListOfClients.FirstOrDefault(x => x.Name == name);
             if (result != null)
             {
@@ -147,7 +149,8 @@ namespace Ada_Credit.Repositories
             {
                 HasHeaderRecord = false,
             };
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "ClientList.csv");
             using (var reader = new StreamReader(csvPath))
             using (var csv = new CsvReader(reader, configuration))
             {
@@ -156,25 +159,55 @@ namespace Ada_Credit.Repositories
             }
         }
 
-        public static void ClientChangeStatus()
+        public static async void ClientChangeStatus()
         {
-            UpdateClientList();
             Console.Clear();
-            Console.Write("Insira o nome do cliente: ");
+            Console.Write("Insira o nome do cliente que deseja alterar: ");
             var name = Console.ReadLine();
-            if (ListOfClients.Any(x => x.Name.Equals(name))) 
+            var result = ListOfClients.FirstOrDefault(x => x.Name == name);
+            if (result != null)
             {
-                Console.WriteLine("Cliente existente");
-                
+                var clients = from c in ListOfClients
+                              where c.Active == true
+                              select c;
 
+                foreach (var c in clients)
+                {
+                    if (c.Active)
+                        Console.Clear();
+                    Console.WriteLine("Desativar cliente? (Responder com s ou n)");
+                    var answer = Console.ReadLine();
+                    if (answer == "s")
+                    {
+                        result.Active = false;
+                        Console.WriteLine("Cliente desativado com sucesso!");
 
+                    }
+                    if (answer == "n")
+                    {
+                        result.Active = true;
+                        Console.WriteLine("Cliente ainda ativo!");
+                    }
+
+                    Console.WriteLine("Pressione qualquer tecla para continuar");
+                    Console.ReadKey();
+                    Save();
+                    return;
+                }
             }
             else
-                Console.WriteLine("Cliente não existente");
+            {
+                Console.Clear();
+                Console.WriteLine("Cliente não encontrado!");
+                Console.WriteLine("Pressione qualquer tecla para continuar");
+                Console.ReadKey();
+
+            }
         }
         public static void Save()
         {
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ClientList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "ClientList.csv");
             using (var writer = new StreamWriter(csvPath))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {

@@ -21,7 +21,8 @@ namespace Ada_Credit.Repositories
         public static void AddEmployee(Employee employee)
         {
             TryEmployee(employee);
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "EmployeeList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "EmployeeList.csv");
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvPath, true))
             {
                 file.WriteLine(employee.NameEmp + "," + employee.loginEmp + "," + employee.passwordEmp);
@@ -43,7 +44,8 @@ namespace Ada_Credit.Repositories
             {
                 HasHeaderRecord = false,
             };
-            var csvPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "EmployeeList.csv");
+            var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)));
+            var csvPath = Path.Combine(path, "EmployeeList.csv");
             using (var reader = new StreamReader(csvPath))
             using (var csv = new CsvReader(reader, configuration))
             {
